@@ -13,14 +13,15 @@ FROM php-base AS build
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 COPY composer.json composer.lock ./
-RUN composer install --prefer-dist --no-interaction --no-progress \
+RUN composer install --no-dev --prefer-dist --no-interaction --no-progress \
     --no-scripts --no-autoloader --ignore-platform-reqs
 
 COPY . .
 
-RUN mkdir -p bootstrap/cache storage/framework/cache/data \
+RUN rm -f bootstrap/cache/*.php \
+    && mkdir -p bootstrap/cache storage/framework/cache/data \
     storage/framework/sessions storage/framework/views storage/logs storage/app/public \
-    && composer dump-autoload --optimize --no-interaction --ignore-platform-reqs
+    && composer dump-autoload --no-dev --optimize --no-interaction --ignore-platform-reqs
 
 FROM php-base AS production
 
